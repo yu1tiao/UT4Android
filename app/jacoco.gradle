@@ -1,0 +1,65 @@
+apply plugin: 'jacoco'
+
+//android {
+//    buildTypes {
+//        debug {
+//            testCoverageEnabled = true
+//        }
+//    }
+//}
+
+def coverageSourceDirs = [
+        '../app/src/main/java'
+]
+
+def coverageClassDirs = [
+        '/app/build/tmp/kotlin-classes/debug'
+]
+
+def ecFileParentDir = "$buildDir/outputs/code-coverage"
+def ecFile = "$ecFileParentDir/coverage.ec"
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+task jacocoTestReport(type: JacocoReport) {
+    group = "JacocoReport"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    classDirectories.from = files(files(coverageClassDirs).files.collect {
+        println("$rootDir" + it)
+        fileTree(dir: "$rootDir" + it,
+                excludes: ['**/R*.class',
+                           '**/*$InjectAdapter.class',
+                           '**/*$ModuleAdapter.class',
+                           '**/*$ViewInjector*.class'
+                ])
+    })
+    sourceDirectories.from = files(coverageSourceDirs)
+    executionData.from = files(ecFile)
+
+    doFirst {
+        coverageClassDirs.each { path ->
+            println("$rootDir" + path)
+            new File("$rootDir" + path).eachFileRecurse { file ->
+                if (file.name.contains('$$')) {
+                    file.renameTo(file.path.replace('$$', '$'))
+                }
+            }
+        }
+    }
+}
+
+task jacocoInit() {
+    group = "JacocoReport"
+    doFirst {
+        File file = new File(ecFileParentDir)
+        if (!file.exists()) {
+            file.mkdir();
+        }
+    }
+}
