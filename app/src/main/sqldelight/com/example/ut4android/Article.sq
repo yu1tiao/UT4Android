@@ -1,0 +1,13 @@
+CREATE TABLE article (
+    _id INTEGER PRIMARY KEY AUTOINCREMENT,
+    gid INTEGER NOT NULL DEFAULT 0,
+    originId INTEGER NOT NULL DEFAULT 0,
+    title TEXT NOT NULL,
+    link TEXT NOT NULL,
+    author TEXT,
+    niceDate TEXT,
+    publishTime INTEGER,
+    UNIQUE (gid)
+);
+
+CREATE INDEX article_title ON article(title);

@@ -3,10 +3,13 @@ package com.example.ut4android.di
 import android.app.Application
 import com.example.ut4android.App
 import com.example.ut4android.Constants
-import com.example.ut4android.data.local.AppDatabase
+import com.example.ut4android.Database
 import com.example.ut4android.data.local.ArticleDao
+import com.example.ut4android.data.local.ArticleDaoImpl
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.squareup.sqldelight.android.AndroidSqliteDriver
+import com.squareup.sqldelight.db.SqlDriver
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -87,16 +90,23 @@ class ApplicationModule {
             .build()
     }
 
+
     @Provides
     @Singleton
-    fun provideDatabase(): AppDatabase {
-        return AppDatabase.get()
+    fun provideSqlDriver(context: Application): SqlDriver {
+        return AndroidSqliteDriver(Database.Schema, context, "my_db.db")
     }
 
     @Provides
     @Singleton
-    fun provideArticle(db: AppDatabase): ArticleDao {
-        return db.articleDao()
+    fun provideDatabase(driver: SqlDriver): Database {
+        return Database(driver)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDao(db: Database): ArticleDao {
+        return ArticleDaoImpl(db)
     }
 
 }

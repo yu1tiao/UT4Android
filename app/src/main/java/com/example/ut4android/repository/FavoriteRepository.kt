@@ -1,10 +1,9 @@
 package com.example.ut4android.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations.map
+import com.example.ut4android.Article
 import com.example.ut4android.core.ApiException
 import com.example.ut4android.data.local.ArticleDao
-import com.example.ut4android.data.local.entity.ArticleEntity
 import com.example.ut4android.data.remote.api.FavoriteApi
 import com.example.ut4android.util.fetchResult
 import javax.inject.Inject
@@ -15,11 +14,11 @@ import javax.inject.Inject
  * @date 2022/7/1
  */
 interface IFavoriteRepository {
-    fun getFavoriteArticleList(page: Int): LiveData<List<ArticleEntity>>
-    suspend fun loadFavoriteArticleList(page: Int): Result<List<ArticleEntity>>
+    fun getFavoriteArticleList(page: Int): LiveData<List<Article>>
+    suspend fun loadFavoriteArticleList(page: Int): Result<List<Article>>
     suspend fun addFavoriteArticle(title: String, author: String, link: String): Result<Boolean>
-    suspend fun removeFavoriteArticle(id: Long, originId: Int): Result<Boolean>
-    suspend fun updateArticle(entity: ArticleEntity): Result<Boolean>
+    suspend fun removeFavoriteArticle(id: Long, originId: Long): Result<Boolean>
+    suspend fun updateArticle(entity: Article): Result<Boolean>
 }
 
 class FavoriteRepository @Inject constructor(
@@ -27,11 +26,11 @@ class FavoriteRepository @Inject constructor(
     private val dao: ArticleDao,
 ) : IFavoriteRepository {
 
-    override fun getFavoriteArticleList(page: Int): LiveData<List<ArticleEntity>> {
+    override fun getFavoriteArticleList(page: Int): LiveData<List<Article>> {
         return dao.getAllArticles()
     }
 
-    override suspend fun loadFavoriteArticleList(page: Int): Result<List<ArticleEntity>> {
+    override suspend fun loadFavoriteArticleList(page: Int): Result<List<Article>> {
         val remoteResult = fetchResult {
             api.getFavoriteArticleList(page)
         }
@@ -45,7 +44,6 @@ class FavoriteRepository @Inject constructor(
                 if (entity == null) {
                     dao.insert(it)
                 } else {
-                    it._id = entity._id
                     dao.update(it)
                 }
             }
@@ -77,7 +75,7 @@ class FavoriteRepository @Inject constructor(
         }
     }
 
-    override suspend fun removeFavoriteArticle(id: Long, originId: Int): Result<Boolean> {
+    override suspend fun removeFavoriteArticle(id: Long, originId: Long): Result<Boolean> {
         val remoteResult = fetchResult {
             api.removeFavoriteArticle(id, originId)
         }
@@ -91,8 +89,12 @@ class FavoriteRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateArticle(entity: ArticleEntity): Result<Boolean> {
-        val count = dao.update(entity)
-        return Result.success(count > 0)
+    override suspend fun updateArticle(entity: Article): Result<Boolean> {
+        return try {
+            dao.update(entity)
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.success(false)
+        }
     }
 }

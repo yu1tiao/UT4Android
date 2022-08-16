@@ -1,0 +1,16 @@
+
+selectAll:
+SELECT * FROM article;
+
+selectById:
+SELECT *FROM article WHERE gid=?;
+
+deleteById:
+DELETE FROM article WHERE gid=?;
+
+insert:
+INSERT OR REPLACE INTO article(gid,originId,title,link,author,niceDate,publishTime)
+VALUES (?,?,?,?,?,?,?);
+
+update:
+UPDATE article SET title=?, link=?, author=?, niceDate=?, publishTime=? WHERE gid=?;

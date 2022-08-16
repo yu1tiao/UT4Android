@@ -1,11 +1,9 @@
 package com.example.ut4android.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.ut4android.data.remote.response.Article
+import com.example.ut4android.Article
 import com.example.ut4android.core.BaseViewModel
-import com.example.ut4android.data.local.entity.ArticleEntity
 import com.example.ut4android.repository.IFavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +21,7 @@ class FavoriteViewModel @Inject constructor(
     private val repository: IFavoriteRepository
 ) : BaseViewModel() {
 
-    val favorites: LiveData<List<ArticleEntity>> = repository.getFavoriteArticleList(0)
+    val favorites: LiveData<List<Article>> = repository.getFavoriteArticleList(0)
 
     fun loadFavoriteArticleList(page: Int) = viewModelScope.launch {
         if (page < 0) {
@@ -65,7 +63,7 @@ class FavoriteViewModel @Inject constructor(
         hideLoading()
     }
 
-    fun removeFavoriteArticle(id: Long, originId: Int) = viewModelScope.launch {
+    fun removeFavoriteArticle(id: Long, originId: Long) = viewModelScope.launch {
         showLoading()
         repository.removeFavoriteArticle(id, originId)
             .onFailure {
@@ -74,7 +72,7 @@ class FavoriteViewModel @Inject constructor(
         hideLoading()
     }
 
-    fun update(entity: ArticleEntity) = viewModelScope.launch {
+    fun update(entity: Article) = viewModelScope.launch {
         repository.updateArticle(entity)
     }
 }

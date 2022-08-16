@@ -2,7 +2,6 @@ package com.example.ut4android.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +12,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.ut4android.Article
 import com.example.ut4android.R
-import com.example.ut4android.data.remote.response.Article
 import com.example.ut4android.core.BaseFragment
-import com.example.ut4android.data.local.entity.ArticleEntity
 import com.example.ut4android.databinding.FragmentFavoriteListBinding
 import com.example.ut4android.databinding.ItemFavoriteBinding
 import com.example.ut4android.util.toast
@@ -51,7 +49,7 @@ class FavoriteListFragment : BaseFragment(R.layout.fragment_favorite_list) {
         viewModel.loadFavoriteArticleList(0)
     }
 
-    private fun onItemClick(isLongClick: Boolean, article: ArticleEntity) {
+    private fun onItemClick(isLongClick: Boolean, article: Article) {
         if (isLongClick) {
             showRemoveFavoriteDialog(article)
         } else {
@@ -64,14 +62,13 @@ class FavoriteListFragment : BaseFragment(R.layout.fragment_favorite_list) {
         }
     }
 
-    private fun showRemoveFavoriteDialog(article: ArticleEntity) {
+    private fun showRemoveFavoriteDialog(article: Article) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Do you want to remove it from your favorites?")
-            .setPositiveButton("ok") { d, _ ->
-                viewModel.removeFavoriteArticle(article.gid, article.originId)
-                d.dismiss()
-            }
-            .setNegativeButton("cancel") { d, _ ->
+            .setItems(arrayOf("update", "delete")) { d, w ->
+                when (w) {
+                    0 -> viewModel.update(article.copy(title = article.title + "_1"))
+                    1 -> viewModel.removeFavoriteArticle(article.gid, article.originId)
+                }
                 d.dismiss()
             }
             .create()
@@ -82,7 +79,7 @@ class FavoriteListFragment : BaseFragment(R.layout.fragment_favorite_list) {
         binding.progress.isVisible = show
     }
 
-    private fun onFavoritesChange(list: List<ArticleEntity>) {
+    private fun onFavoritesChange(list: List<Article>) {
         adapter.setNewData(list)
     }
 
@@ -96,12 +93,12 @@ class FavoriteListFragment : BaseFragment(R.layout.fragment_favorite_list) {
 
 private class FavoriteAdapter(
     private val inflater: LayoutInflater,
-    private val onClick: (isLongClick: Boolean, ArticleEntity) -> Unit
+    private val onClick: (isLongClick: Boolean, Article) -> Unit
 ) : RecyclerView.Adapter<FavoriteAdapter.ViewHolder>() {
 
-    private val data: ArrayList<ArticleEntity> = ArrayList()
+    private val data: ArrayList<Article> = ArrayList()
 
-    fun setNewData(list: List<ArticleEntity>?) {
+    fun setNewData(list: List<Article>?) {
         data.clear()
         list?.let {
             data.addAll(it)

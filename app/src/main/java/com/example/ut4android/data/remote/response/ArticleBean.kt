@@ -1,6 +1,6 @@
 package com.example.ut4android.data.remote.response
 
-import com.example.ut4android.data.local.entity.ArticleEntity
+import com.example.ut4android.Article
 import java.io.Serializable
 
 /**
@@ -8,9 +8,9 @@ import java.io.Serializable
  * @author leo
  * @date 2022/8/2
  */
-data class Article(
+data class ArticleBean(
     var id: Long,
-    var originId: Int,
+    var originId: Long,
     var title: String,
     var chapterId: Int,
     var chapterName: String?,
@@ -27,13 +27,14 @@ data class Article(
     var collect: Boolean
 ) : Serializable {
 
-    fun toEntity() = ArticleEntity(
+    fun toEntity() = Article(
         gid = id,
         originId = originId,
         title = title,
         publishTime = publishTime,
         author = author,
         niceDate = niceDate,
-        link = link
+        link = link,
+        _id = 0
     )
 }

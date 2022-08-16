@@ -28,7 +28,7 @@ interface FavoriteApi {
     @POST("lg/uncollect/{id}/json")
     suspend fun removeFavoriteArticle(
         @Path("id") id: Long,
-        @Field("originId") originId: Int
+        @Field("originId") originId: Long
     ): NetResponse<PageData>
 
 }

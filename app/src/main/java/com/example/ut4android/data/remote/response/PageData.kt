@@ -14,5 +14,5 @@ data class PageData(
     var pageCount: Int,
     var curPage: Int,
     var over: Boolean,
-    var datas: List<Article>?
+    var datas: List<ArticleBean>?
 ) : Serializable

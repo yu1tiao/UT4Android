@@ -1,29 +1,66 @@
 package com.example.ut4android.data.local
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
-import com.example.ut4android.data.local.entity.ArticleEntity
+import androidx.lifecycle.asLiveData
+import com.example.ut4android.Article
+import com.example.ut4android.Database
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * Copyright (c) Spond All rights reserved.
  * @author leo
  * @date 2022/8/8
  */
-@Dao
 interface ArticleDao {
 
-    @Query("select * from ArticleEntity")
-    fun getAllArticles(): LiveData<List<ArticleEntity>>
+    fun getAllArticles(): LiveData<List<Article>>
 
-    @Query("select * from ArticleEntity where gid = :gid")
-    suspend fun queryById(gid: Long): ArticleEntity?
+    suspend fun queryById(gid: Long): Article?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vararg entity: ArticleEntity): List<Long>
+    suspend fun insert(vararg entity: Article)
 
-    @Query("delete from ArticleEntity where gid = :gid")
-    suspend fun deleteById(gid: Long): Int
+    suspend fun deleteById(gid: Long)
 
-    @Update
-    suspend fun update(entity: ArticleEntity): Int
+    suspend fun update(entity: Article)
+}
+
+class ArticleDaoImpl @Inject constructor(private val db: Database) : ArticleDao {
+
+    override fun getAllArticles(): LiveData<List<Article>> {
+        return db._articleQueries.selectAll()
+            .asFlow()
+            .map { it.executeAsList() }
+            .asLiveData()
+    }
+
+    override suspend fun queryById(gid: Long): Article? = withContext(Dispatchers.IO) {
+        db._articleQueries.selectById(gid).executeAsOneOrNull()
+    }
+
+    override suspend fun insert(vararg entity: Article) = withContext(Dispatchers.IO) {
+        entity.forEach {
+            db._articleQueries.insert(
+                it.gid, it.originId, it.title, it.link, it.author, it.niceDate, it.publishTime
+            )
+        }
+    }
+
+    override suspend fun deleteById(gid: Long) = withContext(Dispatchers.IO) {
+        db._articleQueries.deleteById(gid)
+    }
+
+    override suspend fun update(entity: Article) = withContext(Dispatchers.IO) {
+        db._articleQueries.update(
+            entity.title,
+            entity.link,
+            entity.author,
+            entity.niceDate,
+            entity.publishTime,
+            entity.gid
+        )
+    }
 }

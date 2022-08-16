@@ -2,7 +2,7 @@ package com.example.ut4android.mock
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
-import com.example.ut4android.data.local.entity.ArticleEntity
+import com.example.ut4android.Article
 import com.example.ut4android.repository.IFavoriteRepository
 
 /**
@@ -14,11 +14,11 @@ class FakeFavoriteRepository : IFavoriteRepository {
 
     private val time = System.currentTimeMillis()
     private val mockData = listOf(
-        ArticleEntity(1, 1, "title1", time, "http://www.baidu.com", "1", "08-08"),
-        ArticleEntity(2, 2, "title2", time, "http://www.baidu.com", "2", "08-08"),
+        Article(1, 1, 1, "title1", "http://www.baidu.com", "1", "08-08", time),
+        Article(2, 2, 2, "title1", "http://www.baidu.com", "2", "08-09", time),
     )
 
-    override fun getFavoriteArticleList(page: Int): LiveData<List<ArticleEntity>> {
+    override fun getFavoriteArticleList(page: Int): LiveData<List<Article>> {
         return liveData {
             if (page >= 0) {
                 emit(mockData)
@@ -28,7 +28,7 @@ class FakeFavoriteRepository : IFavoriteRepository {
         }
     }
 
-    override suspend fun loadFavoriteArticleList(page: Int): Result<List<ArticleEntity>> {
+    override suspend fun loadFavoriteArticleList(page: Int): Result<List<Article>> {
         return if (page >= 0) {
             Result.success(mockData)
         } else {
@@ -46,7 +46,7 @@ class FakeFavoriteRepository : IFavoriteRepository {
         }
     }
 
-    override suspend fun removeFavoriteArticle(id: Long, originId: Int): Result<Boolean> {
+    override suspend fun removeFavoriteArticle(id: Long, originId: Long): Result<Boolean> {
         return if (id >= 0) {
             Result.success(true)
         } else {
@@ -54,7 +54,7 @@ class FakeFavoriteRepository : IFavoriteRepository {
         }
     }
 
-    override suspend fun updateArticle(entity: ArticleEntity): Result<Boolean> {
+    override suspend fun updateArticle(entity: Article): Result<Boolean> {
         return Result.success(true)
     }
 }
