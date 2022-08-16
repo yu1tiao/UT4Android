@@ -66,12 +66,13 @@ class FavoriteListFragment : BaseFragment(R.layout.fragment_favorite_list) {
 
     private fun showRemoveFavoriteDialog(article: ArticleEntity) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Do you want to remove it from your favorites?")
-            .setPositiveButton("ok") { d, _ ->
-                viewModel.removeFavoriteArticle(article.gid, article.originId)
-                d.dismiss()
-            }
-            .setNegativeButton("cancel") { d, _ ->
+            .setItems(arrayOf("update", "delete")) { d, w ->
+                when (w) {
+                    0 -> viewModel.update(article.apply {
+                        title += "_1"
+                    })
+                    1 -> viewModel.removeFavoriteArticle(article.gid, article.originId)
+                }
                 d.dismiss()
             }
             .create()
