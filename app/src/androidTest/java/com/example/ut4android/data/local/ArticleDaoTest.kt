@@ -6,12 +6,10 @@ import androidx.test.filters.MediumTest
 import com.example.ut4android.App.Companion.context
 import com.example.ut4android.data.local.entity.ArticleEntity
 import com.example.ut4android.support.getOrAwaitValue
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.collection.IsEmptyCollection
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -53,7 +51,7 @@ class ArticleDaoTest {
     fun getAllArticles() {
         val articles = dao.getAllArticles()
         val data = articles.getOrAwaitValue()
-        assertThat(data, IsEmptyCollection())
+        assertThat(data).isEmpty()
     }
 
     @Test
@@ -62,7 +60,7 @@ class ArticleDaoTest {
         assert(ids.isNotEmpty())
 
         val query = dao.queryById(1)
-        assertEquals(query, article)
+        assertThat(query).isEqualTo(article)
     }
 
     @Test
@@ -78,7 +76,7 @@ class ArticleDaoTest {
             val update = dao.update(it)
             assert(update > 0)
             val updated = dao.queryById(1)
-            assertEquals(updated?.title, "updated")
+            assertThat(updated?.title).isEqualTo("updated")
         }
     }
 
@@ -88,10 +86,10 @@ class ArticleDaoTest {
         assert(ids.isNotEmpty())
 
         val count = dao.deleteById(article.gid)
-        assertEquals(count, 1)
+        assertThat(count).isEqualTo(1)
 
         val data = dao.queryById(article.gid)
-        assertEquals(data, null)
+        assertThat(data).isNull()
     }
 
     @Test
@@ -100,6 +98,6 @@ class ArticleDaoTest {
         assert(ids.isNotEmpty())
 
         val data = dao.queryById(article.gid)
-        assertEquals(data, article)
+        assertThat(data).isEqualTo(article)
     }
 }

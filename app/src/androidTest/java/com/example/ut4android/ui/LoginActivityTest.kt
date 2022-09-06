@@ -9,7 +9,6 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.MediumTest
 import com.example.ut4android.R
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
